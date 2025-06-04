@@ -29,8 +29,8 @@ class paint(object):
 
         self.setup()
         
-
         self.window.mainloop()
+        
     def setup(self):
         self.oldx=None
         self.oldy=None
@@ -40,3 +40,59 @@ class paint(object):
         self.active_button=self.penbutton
         self.c.bind=("<B1-Motion>",self.paint)
         self.c.bind=("<ButtonRelease-1>",self.reset)
+        
+    def usepen(self):
+        self.activate_button(self.penbutton)
+        self.brushslider.grid_remove()
+        self.eraseslider.grid_remove()
+        self.penslider.grid(row=0,column=4,padx=10,pady=10)
+    
+    def usebrush(self):
+        self.activate_button(self.brushbutton)
+        self.penslider.grid_remove()
+        self.eraseslider.grid_remove()
+        self.brushslider.grid(row=0,column=4,padx=10,pady=10)
+
+    def useeraser(self):
+        self.activate_button(self.erasebutton)
+        self.brushslider.grid_remove()
+        self.penslider.grid_remove()
+        self.eraseslider.grid(row=0,column=4,padx=10,pady=10)
+
+    def usecolour(self):
+        self.eraser_ON=False
+        self.color=askcolor(color=self.color)[1]
+
+    def activate_button(self,somebutton,eraser_mode=False):
+        self.activate_button.config(relief=RAISED)
+        somebutton.config(relif=SUNKEN)
+        self.active_button=somebutton
+        self.eraser_ON=eraser_mode
+    
+    def paint(self,event):
+        if self.active_button == self.brushbutton:
+            self.line_width=self.brushslider.get()
+        elif self.active_button == self.erasebutton:
+            self.line_width=self.brushslider.get()
+        else:
+            self.line_width=self.penslider.get()
+        
+        paintcolour="white" if self.eraser_ON else self.color
+
+        if self.old_x and self.old_y:
+            self.c.create_line(self.old_x,self.old_y,event.x,event.y,width=self.line_width,
+                               fill=paint_color,capstyle=ROUND,smooth=True,
+                               splinesteps=36)
+        
+        self.old_x=event.x
+        self.old_y=event.y
+    
+    def reset(self,event):
+        self.old_x,self.old_y = None,None
+
+
+
+
+if __name__ =="__ main__":
+    paint()
+
